@@ -72,24 +72,21 @@ void Ispis_Liste(Polinom* dummy)
 	}
 }
 
-void Unesi_Sortirano(Polinom* dummy, Polinom* novi)
+void Sort_Unos(Polinom* dummy, Polinom* nova)
 {
-	//FIXME, NE RADI (JOS!);
-	Polinom* tmp = dummy->next;
-	while(tmp->next != NULL)
-	{
-		tmp = tmp->next;
-	}
-	if(tmp->exponent < novi->exponent && tmp != NULL)
-	{
-		tmp->next = novi;
-	}
-	else if(tmp->exponent > novi->exponent && tmp != NULL)
-	{
-		Polinom* dupli_tmp = tmp;
-		tmp = novi;
-		novi->next = dupli_tmp->next;
-	}
+    if(dummy->next->exp >= nova->exp)
+    {
+        nova->next = dummy->next->next;
+        dummy = nova;
+        return;
+    }
+    Polinom* tmp = head->next;
+    while(tmp->next != NULL && tmp->next->exp < nova->exp)
+    {
+        tmp = tmp->next;
+    }
+    nova->next = tmp->next;
+    tmp->next = nova;
 }
 
 void Ucitaj_Polinom(const char* filename, Polinom* dummy)
