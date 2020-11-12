@@ -127,7 +127,19 @@ void Upisi_U_File(Osoba* dummy)
 
 void Sort_Unos(Osoba* dummy, Osoba* nova)
 {
-	
+    if(dummy->next->prezime[0] >= nova->prezime[0])
+    {
+        nova->next = dummy->next->next;
+        dummy = nova;
+        return;
+    }
+    Osoba* tmp = head->next;
+    while(tmp->next != NULL && tmp->next->prezime[0] < nova->prezime[0])
+    {
+        tmp = tmp->next;
+    }
+    nova->next = tmp->next;
+    tmp->next = nova;
 }
 
 void Ucitaj_Iz_Filea(const char* filename, Osoba* dummy)
