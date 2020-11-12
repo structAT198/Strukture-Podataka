@@ -108,6 +108,100 @@ void Ucitaj_Polinom(const char* filename, Polinom* dummy)
 	}
 }
 
+void Dodaj_Polinome(Polinom* first, Polinom* second, Polinom* rezultat)
+{
+    while(first->next && next->next) 
+	{
+		if(first->exp > second->exp) 
+		{ 
+			rezultat->exp = first->exp; 
+			rezultat->coefficient = first->coefficient; 
+			first = first->next; 
+		}
+		else if(first->exp < second->exp) 
+		{ 
+			rezultat->exp = second->exp; 
+			rezultat->coefficient = second->coefficient; 
+			second = second->next; 
+		}
+		else
+		{ 
+			rezultat->exp = first->exp; 
+			rezultat->coefficient = first->coefficient + second->coefficient; 
+			first = first->next; 
+			second = second->next; 
+		}
+		rezultat->next = (Polinom*) malloc(sizeof(Polinom)); 
+		rezultat = rezultat->next; 
+		rezultat->next = NULL; 
+	} 
+    while(first->next || second->next) 
+	{ 
+		if(first->next) 
+		{ 
+			rezultat->exp = first->exp; 
+			rezultat->coefficient = first->coefficient; 
+			first = first->next; 
+		} 
+		if(second->next) 
+		{ 
+			rezultat->exp = second->exp; 
+			rezultat->coefficient = second->coefficient; 
+			second = second->next; 
+		} 
+		rezultat->next = (Polinom*) malloc(sizeof(Polinom); 
+		rezultat = rezultat->next; 
+		rezultat->next = NULL; 
+	} 
+}
+
+void Mnozi_Polinome(Polinom* first, Polinom* second, Polinom* rezultat)
+{
+    while(first->next && next->next) 
+	{
+		if(first->exp > second->exp) 
+		{ 
+			rezultat->exp = first->exp; 
+			rezultat->coefficient = first->coefficient; 
+			first = first->next; 
+		}
+		else if(first->exp < second->exp) 
+		{ 
+			rezultat->exp = second->exp; 
+			rezultat->coefficient = second->coefficient; 
+			second = second->next; 
+		}
+		else
+		{ 
+			rezultat->exp = first->exp; 
+			rezultat->coefficient = first->coefficient * second->coefficient; 
+			first = first->next; 
+			second = second->next; 
+		}
+		rezultat->next = (Polinom*) malloc(sizeof(Polinom)); 
+		rezultat = rezultat->next; 
+		rezultat->next = NULL; 
+	} 
+    while(first->next || second->next) 
+	{ 
+		if(first->next) 
+		{ 
+			rezultat->exp = first->exp; 
+			rezultat->coefficient = first->coefficient; 
+			first = first->next; 
+		} 
+		if(second->next) 
+		{ 
+			rezultat->exp = second->exp; 
+			rezultat->coefficient = second->coefficient; 
+			second = second->next; 
+		} 
+		rezultat->next = (Polinom*) malloc(sizeof(Polinom); 
+		rezultat = rezultat->next; 
+		rezultat->next = NULL; 
+	} 
+}
+
 int main()
 {
 	Polinom prvi;
