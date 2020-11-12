@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define IME_PREZIME_MAX 50
-
 typedef struct Polinom
 {
 	int coefficient;
@@ -80,7 +78,7 @@ void Sort_Unos(Polinom* dummy, Polinom* nova)
         dummy = nova;
         return;
     }
-    Polinom* tmp = head->next;
+    Polinom* tmp = dummy->next;
     while(tmp->next != NULL && tmp->next->exp < nova->exp)
     {
         tmp = tmp->next;
