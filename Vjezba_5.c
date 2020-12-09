@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 typedef struct Lista
 {
@@ -64,14 +65,63 @@ void Ispisi_Listu(Lista* dummy)
     printf("\n");
 }
 
+bool Postoji(int broj, Lista* dummy)
+{
+    Lista* tmp = dummy->next;
+    while(tmp->next != NULL)
+    {
+        if(tmp->broj == broj)
+        {
+            return true;
+        }
+        tmp = tmp->next;
+    }
+    return false;
+}
+
+void Uniraj(Lista* prva, Lista* druga, Lista* rezultat)
+{
+    Lista* tmp = prva->next;
+    while(tmp->next != NULL)
+    {
+        Unesi_Sortirano(tmp->broj, rezultat);
+        tmp = tmp->next;
+    }
+    Unesi_Sortirano(tmp->broj, rezultat);
+    Lista* tmp2 = druga->next;
+    while(tmp2->next != NULL)
+    {
+        if(Postoji(tmp2->broj, rezultat) == false)
+        {
+            Unesi_Sortirano(tmp2->broj, rezultat);
+        }
+        tmp2 = tmp2->next;
+    }
+}
+
+void Presjeci(Lista* prva, Lista* druga, Lista* rezultat)
+{
+    Lista* tmp = prva->next;
+    while(tmp->next != NULL)
+    {
+        if(Postoji(tmp->broj, druga) == true)
+        {
+            Unesi_Sortirano(tmp->broj, rezultat);
+        }
+        tmp = tmp->next;
+    }
+}
+
 int main()
 {
     Lista prva;
     Lista druga;
-    Lista rezultat;
+    Lista rezultat_u;
+    Lista rezultat_p;
     prva.next = NULL;
     druga.next = NULL;
-    rezultat.next = NULL;
+    rezultat_u.next = NULL;
+    rezultat_p.next = NULL;
     Unesi_Sortirano(8, & prva);
     Unesi_Sortirano(1, & prva);
     Unesi_Sortirano(5, & prva);
@@ -83,5 +133,9 @@ int main()
     Unesi_Sortirano(2, & druga);
     Ispisi_Listu(& prva);
     Ispisi_Listu(& druga);
+    Uniraj(& prva, & druga, & rezultat_u);
+    Ispisi_Listu(& rezultat_u);
+    Presjeci(& prva, & druga, & rezultat_p);
+    Ispisi_Listu(& rezultat_p);
     return 0;
 }
