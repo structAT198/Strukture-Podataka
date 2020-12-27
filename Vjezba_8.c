@@ -26,9 +26,10 @@ Stack* Novi_Stack(int broj)
     return novi;
 }
 
-Directory* Novi_Directory()
+Directory* Novi_Directory(char* name)
 {
     Directory* novi = (Directory*) malloc(sizeof(Directory));
+    strcpy(novi->name, name);
     novi->siblings = NULL;
     novi->child = NULL;
     return novi;
@@ -37,7 +38,7 @@ Directory* Novi_Directory()
 void Ispisi_Stack(Stack* dummy)
 {
     Stack* tmp = dummy->next;
-    while (tmp != NULL)
+    while(tmp != NULL)
     {
         printf("%d ", tmp->broj);
         tmp = tmp->next;
@@ -48,7 +49,7 @@ void Ispisi_Stack(Stack* dummy)
 void Push(Stack* dummy, int broj)
 {
     Stack* tmp = dummy->next;
-    if (tmp == NULL)
+    if(tmp == NULL)
     {
         dummy->next = Novi_Stack(broj);
     }
@@ -63,7 +64,7 @@ void Push(Stack* dummy, int broj)
 void Pop(Stack* dummy)
 {
     Stack* tmp = dummy->next;
-    if (tmp == NULL)
+    if(tmp == NULL)
     {
         printf("Stack prazan!");
     }
@@ -75,72 +76,84 @@ void Pop(Stack* dummy)
     }
 }
 
-/*void Unesi_Sortirano(int broj, Lista* dummy)
+void Add_Child(char* name, Directory* parent)
 {
-    Lista* tmp = dummy->next;
-    if (tmp == NULL)
+    //W.I.P.
+    Directory* tmp = parent->child;
+    if(tmp == NULL)
     {
-        dummy->next = Nova_Lista(broj);
+        tmp = Novi_Directory(name);
     }
     else
     {
-        if (tmp->broj > broj)
+        if(tmp->name[0] > name[0])
         {
-            Lista* nova = Nova_Lista(broj);
-            dummy->next = nova;
-            nova->next = tmp;
+            Directory* novi = Novi_Directory(name);
+            parent->child = novi;
+            novi->child = tmp;
         }
         else
         {
-            while ((tmp->next != NULL) && !((tmp->next->broj > broj) && (tmp->broj <= broj)))
+            while((tmp->child != NULL) && !((tmp->child->name[0] > name[0]) && (tmp->name[0] <= name[0])))
             {
-                tmp = tmp->next;
+                tmp = tmp->child;
             }
-            if (tmp->next == NULL)
+            if(tmp->child == NULL)
             {
-                Lista* nova = Nova_Lista(broj);
-                tmp->next = nova;
+                Directory* novi = Novi_Directory(name);
+                tmp->child = novi;
             }
             else
             {
-                Lista* nova = Nova_Lista(broj);
-                Lista* tmp2 = tmp->next;
-                tmp->next = nova;
-                nova->next = tmp2;
+                Directory* nova = Novi_Directory(name);
+                Directory* tmp2 = tmp->child;
+                tmp->child = nova;
+                nova->child = tmp2;
             }
         }
     }
-}*/
+}
+
+void Add_Sibling(char* name, Directory* parent)
+{
+
+}
 
 int main()
 {
     char command_name[256];
-    char command[6];
-    char name[256];
-    int trash = 0;
+    Directory root;
+    strcpy(root.name, "C:");
+    root.siblings = NULL;
+    root.child = NULL;
     while(1)
     {
-        trash = scanf("%s", command_name);
-        int trash_size = strlen(command_name);
-        /*if(strcmp(command, "cd") == 0)
+        gets_s(& command_name, 256);
+        char* command = strtok(command_name, " ");
+        char* name = strtok(NULL, " ");
+        if(strcmp(command, "cd") == 0)
         {
-            printf("Pozvan cd, na: %s\n", name);
+            
         }
-        else if (strcmp(command, "md") == 0)
+        else if(strcmp(command, "md") == 0)
         {
-            printf("Pozvan md, na: %s\n", name);
+
         }
-        else if (strcmp(command, "dir") == 0)
+        else if(strcmp(command, "dir") == 0)
         {
-            printf("Pozvan dir, na: %s\n", name);
+
         }
-        else if (strcmp(command, "rm") == 0)
+        else if(strcmp(command, "rm") == 0)
         {
-            printf("Pozvan rm, na: %s\n", name);
+
+        }
+        else if(strcmp(command, "exit") == 0)
+        {
+            return 0;
         }
         else
         {
             printf("Nepoznata komanda!\n");
-        }*/
+        }
     }
 }
