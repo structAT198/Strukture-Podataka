@@ -2,26 +2,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #define MAX_NAME_LENGTH 256
 
 typedef struct Stack
 {
-    int broj;
+    struct Directory* directory;
     struct Stack* next;
 }Stack;
 
 typedef struct Directory
 {
     char name[MAX_NAME_LENGTH];
-    struct Directory* siblings;
+    struct Directory* sibling;
     struct Directory* child;
 }Directory;
 
-Stack* Novi_Stack(int broj)
+Stack* Novi_Stack(Directory* directory)
 {
     Stack* novi = (Stack*) malloc(sizeof(Stack));
-    novi->broj = broj;
+    novi->directory = directory;
     novi->next = NULL;
     return novi;
 }
@@ -30,7 +31,7 @@ Directory* Novi_Directory(char* name)
 {
     Directory* novi = (Directory*) malloc(sizeof(Directory));
     strcpy(novi->name, name);
-    novi->siblings = NULL;
+    novi->sibling = NULL;
     novi->child = NULL;
     return novi;
 }
@@ -40,28 +41,28 @@ void Ispisi_Stack(Stack* dummy)
     Stack* tmp = dummy->next;
     while(tmp != NULL)
     {
-        printf("%d ", tmp->broj);
+        printf("%s ", tmp->directory->name);
         tmp = tmp->next;
     }
     printf("\n");
 }
 
-void Push(Stack* dummy, int broj)
+void Push(Stack* dummy, Directory* directory)
 {
     Stack* tmp = dummy->next;
     if(tmp == NULL)
     {
-        dummy->next = Novi_Stack(broj);
+        dummy->next = Novi_Stack(directory);
     }
     else
     {
         Stack* prije = tmp;
-        dummy->next = Novi_Stack(broj);
+        dummy->next = Novi_Stack(directory);
         dummy->next->next = tmp;
     }
 }
 
-void Pop(Stack* dummy)
+Directory* Pop(Stack* dummy)
 {
     Stack* tmp = dummy->next;
     if(tmp == NULL)
@@ -70,53 +71,115 @@ void Pop(Stack* dummy)
     }
     else
     {
+        Directory* directory = tmp->directory;
         Stack* prije = tmp->next;
         free(tmp);
         dummy->next = prije;
+        return directory;
     }
 }
 
-void Add_Child(char* name, Directory* parent)
+void Add_Sibling(Directory* relative, char* name)
 {
-    //W.I.P.
-    Directory* tmp = parent->child;
-    if(tmp == NULL)
+    Directory* tmp = relative;
+    while(tmp->sibling != NULL)
     {
-        tmp = Novi_Directory(name);
+        tmp = tmp->sibling;
+    }
+    tmp->sibling = Novi_Directory(name);
+}
+
+void Add_Child(Directory* parent, char* name)
+{
+    if(parent->child != NULL)
+    {
+        Add_Sibling(parent->child, name);
     }
     else
     {
-        if(tmp->name[0] > name[0])
+        parent->child = Novi_Directory(name);
+    }
+}
+
+void Remove_Child(Directory* directory)
+{
+    //jos samo ovo
+}
+
+bool Directory_Exists(Directory* current_directory, char* name)
+{
+    Directory* tmp = current_directory;
+    if(tmp->child == NULL)
+    {
+        return false;
+    }
+    else
+    {
+        if(strcmp(tmp->child->name, name) == 0)
         {
-            Directory* novi = Novi_Directory(name);
-            parent->child = novi;
-            novi->child = tmp;
+            return true;
         }
         else
         {
-            while((tmp->child != NULL) && !((tmp->child->name[0] > name[0]) && (tmp->name[0] <= name[0])))
+            Directory* tmp_2 = current_directory->child->sibling;
+            while(tmp_2 != NULL)
             {
-                tmp = tmp->child;
+                if(strcmp(tmp_2->name, name) == 0)
+                {
+                    return true;
+                }
+                tmp_2 = tmp_2->sibling;
             }
-            if(tmp->child == NULL)
+            return false;
+        }
+    }
+}
+
+Directory* Get_Directory(Directory* current_directory, char* name)
+{
+    Directory* tmp = current_directory;
+    if(tmp->child != NULL)
+    {
+        if(strcmp(tmp->child->name, name) == 0)
+        {
+            return tmp->child;
+        }
+        else
+        {
+            Directory* tmp_2 = current_directory->child->sibling;
+            while(tmp_2 != NULL)
             {
-                Directory* novi = Novi_Directory(name);
-                tmp->child = novi;
-            }
-            else
-            {
-                Directory* nova = Novi_Directory(name);
-                Directory* tmp2 = tmp->child;
-                tmp->child = nova;
-                nova->child = tmp2;
+                if(strcmp(tmp_2->name, name) == 0)
+                {
+                    return tmp_2;
+                }
+                tmp_2 = tmp_2->sibling;
             }
         }
     }
 }
 
-void Add_Sibling(char* name, Directory* parent)
+void Print_Directory(Directory* current_directory)
 {
-
+    Directory* tmp = current_directory->child;
+    if(tmp == NULL)
+    {
+        printf("Direktorij prazan!\n");
+        return;
+    }
+    else
+    {
+        printf("    >> %s\n", tmp->name);
+        if(tmp->sibling != NULL)
+        {
+            Directory* tmp_2 = current_directory->child->sibling;
+            while(tmp_2 != NULL)
+            {
+                printf("    >> %s\n", tmp_2->name);
+                tmp_2 = tmp_2->sibling;
+            }
+        }
+    }
 }
 
 int main()
@@ -124,8 +187,14 @@ int main()
     char command_name[256];
     Directory root;
     strcpy(root.name, "C:");
-    root.siblings = NULL;
+    root.sibling = NULL;
     root.child = NULL;
+    Stack cd_stack;
+    cd_stack.next = NULL;
+    Directory* current_directory = & root;
+    char prompt[512] = { "C:\\" };
+    printf("%s", prompt);
+    printf(">");
     while(1)
     {
         gets_s(& command_name, 256);
@@ -133,19 +202,59 @@ int main()
         char* name = strtok(NULL, " ");
         if(strcmp(command, "cd") == 0)
         {
-            
+            if(strcmp(name, "..") == 0) 
+            {
+                if(strcmp(current_directory->name, "C:") != 0)
+                {
+                    int prompt_length = strlen(prompt);
+                    int current_name_length = strlen(current_directory->name);
+                    for(int i = 0; i < (current_name_length + 2); i++)
+                    {
+                        prompt[prompt_length - i] = '\0';
+                    }
+                    current_directory = Pop(& cd_stack);
+                }
+            }
+            else
+            {
+                if(Directory_Exists(current_directory, name) == true)
+                {
+                    Push(& cd_stack, current_directory);
+                    current_directory = Get_Directory(current_directory, name);
+                    strcat(& prompt, name);
+                    prompt[strlen(prompt)] = '\\';
+                }
+                else
+                {
+                    printf("Direktorij \"%s\" ne postoji!\n", name);
+                }
+            }
         }
         else if(strcmp(command, "md") == 0)
         {
-
+            if(Directory_Exists(current_directory, name) == false)
+            {
+                Add_Child(current_directory, name);
+            }
+            else
+            {
+                printf("Direktorij vec postoji!\n");
+            }
         }
         else if(strcmp(command, "dir") == 0)
         {
-
+            Print_Directory(current_directory);
         }
         else if(strcmp(command, "rm") == 0)
         {
-
+            if(Directory_Exists(current_directory, name) == true)
+            {
+                Remove_Child(Get_Directory(current_directory, name));
+            }
+            else
+            {
+                printf("Direktorij ne postoji!\n");
+            }
         }
         else if(strcmp(command, "exit") == 0)
         {
@@ -155,5 +264,7 @@ int main()
         {
             printf("Nepoznata komanda!\n");
         }
+        printf("%s", prompt);
+        printf(">");
     }
 }
