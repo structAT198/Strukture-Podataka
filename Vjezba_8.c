@@ -101,9 +101,39 @@ void Add_Child(Directory* parent, char* name)
     }
 }
 
-void Remove_Child(Directory* directory)
+void Kill_Child(Directory* directory)
 {
-    //jos samo ovo
+    if(directory != NULL)
+    {
+        Kill_Child(directory->child);
+        Kill_Child(directory->sibling);
+        free(directory);
+        return;
+    }
+}
+
+void Remove_Child(Directory* parent, Directory* zombie)
+{
+    if(zombie == NULL)
+    {
+        return;
+    }
+    Directory* tmp = parent;
+    if(tmp->child == zombie)
+    {
+        tmp->child = zombie->sibling;
+    }
+    else
+    {
+        tmp = tmp->child;
+        while(tmp->sibling != zombie)
+        {
+            tmp = tmp->sibling;
+        }
+        tmp->sibling = zombie->sibling;
+    }
+    zombie->sibling = NULL;
+    Kill_Child(zombie);
 }
 
 bool Directory_Exists(Directory* current_directory, char* name)
@@ -249,7 +279,7 @@ int main()
         {
             if(Directory_Exists(current_directory, name) == true)
             {
-                Remove_Child(Get_Directory(current_directory, name));
+                Remove_Child(current_directory, Get_Directory(current_directory, name));
             }
             else
             {
