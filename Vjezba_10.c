@@ -13,8 +13,8 @@ typedef struct Tree
 
 typedef struct List
 {
-	Tree* treeNode;
-	List* next;
+	struct Tree* treeNode;
+	struct List* next;
 }List;
 
 Tree* Create(char* data)
@@ -22,7 +22,7 @@ Tree* Create(char* data)
 	Tree* new = (Tree*) malloc(sizeof(Tree));
 	if(new == NULL)
 	{
-		prinf("Malloc failed!");
+		printf("Malloc failed!");
 		return -1;
 	}
 	strcpy(new->data, data);
@@ -84,6 +84,7 @@ Tree* ReadFromFile(char* filename)
 	List head;
 	head.next = NULL;
 	Tree* result = NULL;
+	char character[DATA_SIZE] = { 0 };
 	if(data == NULL)
 	{
 		printf("\nDatoteka ne postoji!");
@@ -94,15 +95,14 @@ Tree* ReadFromFile(char* filename)
 		while(feof(data) != 1)
 		{
 			Tree* node = NULL;
-			node = Create(data);
+			node = Create(character);
 			if(node == NULL)
 			{
 				fclose(data);
 				return 0;
 			}
-			char character[DATA_SIZE] = { 0 };
-			fscanf(data, "%s", data);
-			if(IsNumber(data) != 0)
+			fscanf(data, "%s", & character);
+			if(IsNumber(character) != 0)
 			{
 				PushFront(& head, node);
 			}
@@ -111,13 +111,13 @@ Tree* ReadFromFile(char* filename)
 				PopFront(& head);
 				if(node == NULL)
 				{
-					printf("\nKrivi postfix zapis!");
+					printf("\nKrivi postfix zapis! 04");
 					return 0;
 				}
 				node->left = PopFront(& head);
 				if(node->left == NULL)
 				{
-					printf("\nKrivi postfix zapis!");
+					printf("\nKrivi postfix zapis! 03");
 					return 0;
 				}
 				PushFront(& head, node);
@@ -127,11 +127,11 @@ Tree* ReadFromFile(char* filename)
 	result = PopFront(&head);
 	if(result == NULL)
 	{
-		printf("\nKrivi postfix zapis!");
+		printf("\nKrivi postfix zapis! 01");
 	}
 	if (PopFront(& head) != NULL)
 	{
-		printf("\nKrivi postfix zapis!");
+		printf("\nKrivi postfix zapis! 02");
 	}
 	else
 	{
@@ -156,8 +156,9 @@ int main()
 	printf("Unesite ime datoteke: ");
 	scanf(" %s", filename);
 	Tree* test = ReadFromFile(filename);
-	if (test == NULL)
+	if(test == NULL)
 	{
+		system("pause");
 		return 1;
 	}
 	List head;
@@ -168,5 +169,6 @@ int main()
 	{
 		printf("%d");
 	}
+	system("pause");
 	return 0;
 }
