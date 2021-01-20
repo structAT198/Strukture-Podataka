@@ -84,7 +84,6 @@ Tree* ReadFromFile(char* filename)
 	List head;
 	head.next = NULL;
 	Tree* result = NULL;
-	char character[DATA_SIZE] = { 0 };
 	if(data == NULL)
 	{
 		printf("\nDatoteka ne postoji!");
@@ -92,46 +91,47 @@ Tree* ReadFromFile(char* filename)
 	}
 	else
 	{
-		while(feof(data) != 1)
+		while(!feof(data))
 		{
 			Tree* node = NULL;
+			char character[DATA_SIZE] = { '\0' };
+			fscanf(data, " %s", & character);
 			node = Create(character);
 			if(node == NULL)
 			{
 				fclose(data);
 				return 0;
 			}
-			fscanf(data, "%s", & character);
 			if(IsNumber(character) != 0)
 			{
 				PushFront(& head, node);
 			}
 			else
 			{
-				PopFront(& head);
 				if(node == NULL)
 				{
-					printf("\nKrivi postfix zapis! 04");
+					printf("\nKrivi postfix zapis!");
+					return 0;
+				}
+				node->right = PopFront(& head);
+				if(node->right == NULL)
+				{
+					printf("\nKrivi postfix zapis!");
 					return 0;
 				}
 				node->left = PopFront(& head);
-				if(node->left == NULL)
-				{
-					printf("\nKrivi postfix zapis! 03");
-					return 0;
-				}
 				PushFront(& head, node);
 			}
 		}
 	}
-	result = PopFront(&head);
+	result = PopFront(& head);
 	if(result == NULL)
 	{
-		printf("\nKrivi postfix zapis! 01");
+		printf("\nKrivi postfix zapis!");
 	}
-	if (PopFront(& head) != NULL)
+	if(PopFront(& head) != NULL)
 	{
-		printf("\nKrivi postfix zapis! 02");
+		printf("\nKrivi postfix zapis!");
 	}
 	else
 	{
@@ -145,9 +145,12 @@ void PrintInOrder(List* head, Tree* current)
 	{
 		return;
 	}
-	PrintInOrder(head, current->left);
-	PushBack(head, current);
-	PrintInOrder(head, current->right);
+	else
+	{
+		PrintInOrder(head, current->left);
+		PushBack(head, current);
+		PrintInOrder(head, current->right);
+	}
 }
 
 int main()
@@ -167,8 +170,9 @@ int main()
 	List* p;
 	for(p = head.next, p != NULL; p = p->next;)
 	{
-		printf("%d");
+		printf("%s ", p->treeNode->data);
 	}
+	printf("\n");
 	system("pause");
 	return 0;
 }
