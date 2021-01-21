@@ -168,10 +168,18 @@ int main()
 	head.next = NULL;
 	PrintInOrder(& head, test);
 	List* p;
+	FILE* izlaz = fopen("Izlaz.txt", "w");
+	if(izlaz == NULL)
+	{
+		printf("Nemogu otvorit izlaznu datoteku!");
+		return -1;
+	}
 	for(p = head.next, p != NULL; p = p->next;)
 	{
 		printf("%s ", p->treeNode->data);
+		fprintf(izlaz, "%s ", p->treeNode->data);
 	}
+	fclose(izlaz);
 	printf("\n");
 	system("pause");
 	return 0;
